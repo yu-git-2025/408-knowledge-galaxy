@@ -122,8 +122,8 @@
 
     function place(i) {
       if (!alive()) return;
-      const cell = cells[i], tr = ladder.getBoundingClientRect(), cr = cell.getBoundingClientRect();
-      chip.style.transform = `translate(${cr.left - tr.left + cr.width / 2 - 13}px, ${cr.top - tr.top - 34}px)`;
+      const cell = cells[i], tr = chip.parentElement.getBoundingClientRect(), cr = cell.getBoundingClientRect();
+      chip.style.transform = `translate(${cr.left - tr.left + cr.width / 2 - 13}px, ${cr.top - tr.top - 32}px)`;
       chip.classList.add('show');
     }
 
@@ -131,6 +131,7 @@
       if (!alive()) return;
       T.clear(); playing = false; k = -1; total = 0;
       cells.forEach((c) => { c.classList.remove('active', 'hit', 'miss', 'fault'); c.querySelector('.j-flag').className = 'j-flag'; c.querySelector('.j-flag').textContent = ''; });
+      chip.classList.remove('show');
       log.innerHTML = '';
       el.querySelector('[data-ro="cyc"]').innerHTML = '0<small>cyc</small>';
       el.querySelector('[data-ro="lv"]').textContent = '—';
