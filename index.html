@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>408 知识星图 · 数据结构 / 组成原理 / 操作系统 / 计算机网络</title>
+<meta name="description" content="计算机 408 考研四科知识体系的可视化框架：知识星图、章节图谱、六个交互实验，把四本书连成一张网。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231B1E19'/%3E%3Ctext x='16' y='21' font-family='Georgia,serif' font-size='12' fill='%23F7F5EF' text-anchor='middle'%3E408%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- ==================== 导航 ==================== -->
+<header class="nav">
+  <a class="brand" href="#hero">
+    <span class="brand-mark">408</span>
+    <span class="brand-text">知识星图<span>KNOWLEDGE ATLAS</span></span>
+  </a>
+  <nav class="nav-links">
+    <a href="#constellation">知识星图</a>
+    <a href="#atlas">学科图谱</a>
+    <a href="#labs">可视化实验室</a>
+    <a href="#method">备考路径</a>
+  </nav>
+  <div class="nav-right">
+    <div class="ring-pill" id="progressPill" title="掌握度">
+      <svg width="20" height="20" viewBox="0 0 20 20">
+        <circle class="ring-bg" cx="10" cy="10" r="8" fill="none" stroke-width="2.2"/>
+        <circle class="ring-fg" id="globalRing" cx="10" cy="10" r="8" fill="none" stroke-width="2.2"
+                stroke-linecap="round" stroke-dasharray="0 50.27"/>
+      </svg>
+      <span id="globalPct">0%</span>
+    </div>
+    <button class="icon-btn" id="themeToggle" aria-label="切换主题"></button>
+  </div>
+</header>
+
+<main>
+  <!-- ==================== HERO ==================== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"><canvas id="heroCanvas"></canvas></div>
+    <div class="hero-inner">
+      <div class="hero-left">
+        <p class="eyebrow">计算机学科专业基础综合 · 408</p>
+        <h1>四本书<br><em>一张网</em></h1>
+        <p class="lede">
+          408 从来不是四门课的拼盘。一条访存指令穿过 Cache、页表与磁盘；一次 TCP 重传背后是缓冲区、队列与信号量。
+          把知识点<b>连成网</b>，比把四本书各背四遍有用得多。
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="document.getElementById('constellation').scrollIntoView({behavior:'smooth'})">
+            进入知识星图
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h13M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="btn" onclick="document.getElementById('labs').scrollIntoView({behavior:'smooth'})">
+            直接动手看动画
+          </button>
+        </div>
+        <div class="hero-stats" style="margin-top:34px;display:flex;gap:26px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.04em">
+          <span><b style="color:var(--ink-2);font-weight:400;font-size:15px">4</b> 学科</span>
+          <span><b style="color:var(--ink-2);font-weight:400;font-size:15px">25</b> 章</span>
+          <span><b style="color:var(--ink-2);font-weight:400;font-size:15px">110</b> 知识点</span>
+          <span><b style="color:var(--ink-2);font-weight:400;font-size:15px">20</b> 跨科关联</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="subject-strip" id="subjectStrip"></div>
+      </div>
+    </div>
+    <div class="hero-scroll"><span>SCROLL</span><i></i></div>
+  </section>
+
+  <!-- ==================== 01 知识星云 ==================== -->
+  <section class="section" id="constellation">
+    <div class="sec-head reveal">
+      <span class="sec-idx">01 / GALAXY</span>
+      <div>
+        <h2>知识星云</h2>
+        <p class="sub">4 个学科、25 章、110 个考点在三维空间里各自成团。拖拽旋转，滚轮缩放，点击任意光点进入内嵌知识页 —— 20 条跨科关联把它们缝成一张网。</p>
+      </div>
+    </div>
+
+    <div class="galaxy-wrap reveal d1">
+      <div class="g-bar">
+        <div class="g-filters" id="gFilters"></div>
+        <div class="g-tools">
+          <button class="gbtn on" id="gSpin" title="切换自动旋转">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 12a8 8 0 1 1-2.3-5.6" stroke-linecap="round"/><path d="M20 4v4h-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            自转
+          </button>
+          <button class="gbtn" id="gReset">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12a8 8 0 1 1 2.3 5.6" stroke-linecap="round"/><path d="M4 20v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            重置
+          </button>
+        </div>
+      </div>
+      <div class="g-stage" id="gStage">
+        <canvas id="galaxy"></canvas>
+        <div class="g-legend" id="gLegend"></div>
+        <div class="g-tip">拖拽旋转 · 滚轮缩放 · 点击光点进入</div>
+      </div>
+      <div class="g-foot">
+        <span id="gStats">—</span>
+        <span class="g-foot-hint">拖动转视角，滚轮拉近看章节与考点</span>
+      </div>
+    </div>
+
+    <div class="link-index reveal d2">
+      <div class="li-head">
+        <span class="li-title">20 条跨科关联</span>
+        <span class="li-hint">点击任意一条展开：共同内核 / 关键差异 / 命题落点</span>
+      </div>
+      <div class="li-grid" id="linkIndex"></div>
+    </div>
+  </section>
+
+  <!-- ==================== 02 学科图谱 ==================== -->
+  <section class="section" id="atlas">
+    <div class="sec-head reveal">
+      <span class="sec-idx">02 / ATLAS</span>
+      <div>
+        <h2>学科图谱</h2>
+        <p class="sub">按大纲章节展开的 110 个知识点。高频、易错、计算三类标记，帮你把时间花在最值钱的地方；右侧可以逐条标记掌握。</p>
+      </div>
+    </div>
+
+    <div class="tabs reveal" id="atlasTabs"></div>
+    <div class="atlas-body">
+      <aside class="chapter-nav" id="chapterNav"></aside>
+      <div class="chapter-content" id="chapterContent"></div>
+    </div>
+  </section>
+
+  <!-- ==================== 03 实验室 ==================== -->
+  <section class="section" id="labs">
+    <div class="sec-head reveal">
+      <span class="sec-idx">03 / LAB</span>
+      <div>
+        <h2>可视化实验室</h2>
+        <p class="sub">六个可以动手的模型。定义看三遍不如亲手推一次 —— 尤其是访存、置换与拥塞控制这三块。</p>
+      </div>
+    </div>
+
+    <div class="lab-tabs reveal" id="labTabs"></div>
+    <div class="lab-stage reveal d1" id="labStage"></div>
+  </section>
+
+  <!-- ==================== 04 备考路径 ==================== -->
+  <section class="section" id="method">
+    <div class="sec-head reveal">
+      <span class="sec-idx">04 / PATH</span>
+      <div>
+        <h2>备考路径</h2>
+        <p class="sub">408 的分数不在"看过多少"，而在"能不能在 180 分钟里把 150 分算对"。下面是一条被反复验证过的时间线。</p>
+      </div>
+    </div>
+
+    <div class="method-grid reveal">
+      <article class="m-card" style="--c:var(--ds)">
+        <span class="m-num">01</span>
+        <div class="m-phase">MAR — JUN</div>
+        <h4>基础期 · 建地图</h4>
+        <p>四科按顺序过一遍教材与课程，目标不是记住，而是知道每一章在整张地图上的位置。数据结构先动手写代码，组成原理先理解层次。</p>
+        <div class="m-keys"><span>章节框架</span><span>概念辨析</span><span>手写链表</span></div>
+      </article>
+      <article class="m-card" style="--c:var(--co)">
+        <span class="m-num">02</span>
+        <div class="m-phase">JUL — SEP</div>
+        <h4>强化期 · 攻计算</h4>
+        <p>王道单科书二刷，专攻计算题：Cache 映射、页表大小、指令流水线、TCP 序号与窗口、磁盘调度。错题按"知识点"而不是按"题号"归档。</p>
+        <div class="m-keys"><span>Cache 计算</span><span>PV 操作</span><span>子网划分</span></div>
+      </article>
+      <article class="m-card" style="--c:var(--os)">
+        <span class="m-num">03</span>
+        <div class="m-phase">OCT — NOV</div>
+        <h4>真题期 · 连成网</h4>
+        <p>按套刷 408 真题，严格限时 180 分钟。每做完一套，回到星图上找这道题牵连了哪几科 —— 跨科题的分值是最好拿也最容易丢的。</p>
+        <div class="m-keys"><span>限时套卷</span><span>跨科串联</span><span>错题复盘</span></div>
+      </article>
+      <article class="m-card" style="--c:var(--net)">
+        <span class="m-num">04</span>
+        <div class="m-phase">DEC</div>
+        <h4>冲刺期 · 抢记忆分</h4>
+        <p>协议字段、端口号、状态机、术语辨析这类"背了就有"的分数集中回收；同时保持每天一道算法题的手感，别让代码生锈。</p>
+        <div class="m-keys"><span>协议细节</span><span>概念背诵</span><span>每日一题</span></div>
+      </article>
+    </div>
+
+    <div class="thread-list reveal d1">
+      <div class="thread">
+        <div class="th-name">存储主线</div>
+        <div class="th-flow"><b>寄存器</b><i>→</i><b>Cache</b><i>→</i><b>主存</b><i>→</i><b>磁盘</b><i>→</i><b>文件</b><i>→</i><b>索引</b>
+          <span style="color:var(--faint);font-size:11px;margin-left:6px">组成原理 → 操作系统 → 数据结构</span></div>
+      </div>
+      <div class="thread">
+        <div class="th-name">并发主线</div>
+        <div class="th-flow"><b>中断</b><i>→</i><b>用户态/内核态</b><i>→</i><b>进程</b><i>→</i><b>调度</b><i>→</i><b>同步</b><i>→</i><b>死锁</b>
+          <span style="color:var(--faint);font-size:11px;margin-left:6px">组成原理 → 操作系统</span></div>
+      </div>
+      <div class="thread">
+        <div class="th-name">协议主线</div>
+        <div class="th-flow"><b>分组</b><i>→</i><b>缓冲</b><i>→</i><b>窗口</b><i>→</i><b>拥塞</b><i>→</i><b>应用</b>
+          <span style="color:var(--faint);font-size:11px;margin-left:6px">计算机网络 → 操作系统</span></div>
+      </div>
+      <div class="thread">
+        <div class="th-name">时间主线</div>
+        <div class="th-flow"><b>时钟周期</b><i>→</i><b>机器周期</b><i>→</i><b>时间片</b><i>→</i><b>超时重传</b>
+          <span style="color:var(--faint);font-size:11px;margin-left:6px">四科共用的度量尺</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div>
+    <div class="f-brand">408 知识星图</div>
+    <div>知识点框架依据教育部 408 统考大纲整理，体例参考王道考研四科教材。</div>
+    <div>内容为学习用途的归纳，具体表述与分值以当年官方大纲为准。</div>
+  </div>
+  <div style="text-align:right">
+    <div>掌握度保存在浏览器本地（localStorage），不上传。</div>
+    <div>Hover · Click · 单步 · 播放 —— 每个模块都能拆开看。</div>
+  </div>
+</footer>
+
+<noscript>
+  <div style="padding:120px 40px;text-align:center;font-family:sans-serif">
+    本站的星图与动画需要启用 JavaScript。
+  </div>
+</noscript>
+
+<!-- 内嵌知识页 -->
+<div class="pd-mask" id="pdMask"></div>
+<aside class="pd" id="pd" aria-hidden="true">
+  <header class="pd-head">
+    <button class="pd-btn" id="pdBack" aria-label="返回">←</button>
+    <div class="pd-crumb" id="pdCrumb"></div>
+    <button class="pd-btn pd-x" id="pdClose" aria-label="关闭">✕</button>
+  </header>
+  <div class="pd-body" id="pdBody"></div>
+</aside>
+
+<script src="assets/data.js"></script>
+<script src="assets/galaxy.js"></script>
+<script src="assets/pages.js"></script>
+<script src="assets/anims.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
