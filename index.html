@@ -33,6 +33,15 @@
       <span id="globalPct">0%</span>
     </div>
     <button class="icon-btn" id="themeToggle" aria-label="切换主题"></button>
+    <button class="icon-btn nav-toggle" id="navToggle" aria-label="打开目录" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="nav-sheet" id="navSheet">
+    <a href="#constellation">01 · 知识星云</a>
+    <a href="#atlas">02 · 学科图谱</a>
+    <a href="#labs">03 · 可视化实验室</a>
+    <a href="#method">04 · 备考路径</a>
   </div>
 </header>
 
@@ -77,7 +86,7 @@
       <span class="sec-idx">01 / GALAXY</span>
       <div>
         <h2>知识星云</h2>
-        <p class="sub">4 个学科、25 章、110 个考点在三维空间里各自成团。拖拽旋转，滚轮缩放，点击任意光点进入内嵌知识页 —— 20 条跨科关联把它们缝成一张网。</p>
+        <p class="sub">4 个学科核排成一圈，每个学科外围是它自己的章节轨道，考点收在章节里 —— 空间结构和目录结构是一回事。点学科进入，点章节展开考点，20 条跨科关联把它们连成一张网。</p>
       </div>
     </div>
 
@@ -85,24 +94,38 @@
       <div class="g-bar">
         <div class="g-filters" id="gFilters"></div>
         <div class="g-tools">
+          <div class="g-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="6.2"/><path d="M15.2 15.2 20 20" stroke-linecap="round"/></svg>
+            <input id="gSearch" type="search" placeholder="搜索考点 / 章节" autocomplete="off" aria-label="搜索考点或章节">
+            <div class="g-results" id="gResults" hidden></div>
+          </div>
+          <div class="g-zoom">
+            <button class="gbtn gbtn-sq" id="gZoomOut" aria-label="缩小">−</button>
+            <button class="gbtn gbtn-sq" id="gZoomIn" aria-label="放大">＋</button>
+          </div>
           <button class="gbtn on" id="gSpin" title="切换自动旋转">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 12a8 8 0 1 1-2.3-5.6" stroke-linecap="round"/><path d="M20 4v4h-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            自转
+            <span>自转</span>
           </button>
           <button class="gbtn" id="gReset">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12a8 8 0 1 1 2.3 5.6" stroke-linecap="round"/><path d="M4 20v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            重置
+            <span>全景</span>
           </button>
         </div>
       </div>
+
+      <div class="g-chapters" id="gChapters"></div>
+
       <div class="g-stage" id="gStage">
-        <canvas id="galaxy"></canvas>
+        <canvas id="galaxy" role="img" aria-label="408 四科知识星图。可拖拽旋转、双指或滚轮缩放、点击学科与章节查看详情"></canvas>
+        <div class="g-hud" id="gHud"></div>
         <div class="g-legend" id="gLegend"></div>
-        <div class="g-tip">拖拽旋转 · 滚轮缩放 · 点击光点进入</div>
+        <div class="g-tip" id="gTip"></div>
       </div>
+
       <div class="g-foot">
         <span id="gStats">—</span>
-        <span class="g-foot-hint">拖动转视角，滚轮拉近看章节与考点</span>
+        <span class="g-foot-hint">双击学科聚焦 · Esc 返回全景</span>
       </div>
     </div>
 
@@ -126,9 +149,23 @@
     </div>
 
     <div class="tabs reveal" id="atlasTabs"></div>
+
+    <div class="atlas-tools reveal">
+      <div class="afilters" id="atlasFilters">
+        <button class="afilter on" data-f="all">全部考点</button>
+        <button class="afilter" data-f="todo">只看未掌握</button>
+        <button class="afilter" data-f="hot">只看高频</button>
+      </div>
+      <div class="atlas-progress" id="atlasProgress"></div>
+    </div>
+
     <div class="atlas-body">
       <aside class="chapter-nav" id="chapterNav"></aside>
-      <div class="chapter-content" id="chapterContent"></div>
+      <div class="chapter-content">
+        <div class="ch-switch" id="chSwitch"></div>
+        <div id="chapterContent"></div>
+        <div class="ch-pager" id="chPager"></div>
+      </div>
     </div>
   </section>
 
